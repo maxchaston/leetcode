@@ -1,4 +1,5 @@
 # 60. Permutation Sequence
+import math
 
 '''
 The set [1, 2, 3, ..., n] contains a total of n! unique permutations.
@@ -37,48 +38,36 @@ Constraints:
     1 <= k <= n!
 '''
 
+'''
+Solution explanation:
+
+Calculate the number of permutations under each element, traverse straight
+down the corrent node in the "tree" based on permutation number trying to find.
+'''
+
+def factorial(n):
+    if n<=1:
+        return 1
+    return n * factorial(n-1)
+
 class Solution:
     def getPermutation(self, n: int, k: int) -> str:
-        self.count = 0
-        self.k = k
-        self.n = n
         l = list(range(1, n+1))
-        ret = flatten(self.recursivePermute([], l))
+        tmp_k = k
+        found = []
+        while len(l)>1:
+            layer_perm_num = factorial(len(l)-1) # number of possible permutations under each tree node
+            index = math.ceil((tmp_k/layer_perm_num)-1)
+            num = l[index]
+            found.append(l[index])
+            del l[index]
+            tmp_k-=index*layer_perm_num
+        found.append(l[0])
         s = ""
-        for x in ret:
+        for x in found:
             s+=str(x)
         return s
-    def recursivePermute(self, processed, remaining):
-        if remaining == []:
-            self.count+=1
-            print(self.count)
-            if self.count==self.k:
-                print(f"Found {processed}")
-                return processed
-        found = []
-        for num in remaining:
-            tmp_remain = remaining.copy()
-            tmp_processed = processed.copy()
-            tmp_processed.append(num)
-            tmp_remain.remove(num)
-            found.append(self.recursivePermute(tmp_processed, tmp_remain))
-        return list(filter(lambda x: x!=[], found))
-    def test(self):
-        print(self.recursivePermute([], list(range(1, 10))))
-
-def flatten(possiblyNestedList):
-    # Flatten abritrarily nested list
-    if not isinstance(possiblyNestedList, list):
-        return
-    flattened = []
-    for item in possiblyNestedList:
-        if isinstance(item, list):
-            flattened.extend(flatten(item))
-        else:
-            flattened.append(item)
-    return flattened
-
 
 x = Solution()
-print(x.getPermutation(4, 9))
+print(x.getPermutation(3, 3))
     
