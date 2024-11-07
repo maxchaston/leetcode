@@ -43,6 +43,8 @@ Solution explanation:
 
 Calculate the number of permutations under each element, traverse straight
 down the corrent node in the "tree" based on permutation number trying to find.
+
+Not sure how this was a hard.
 '''
 
 def factorial(n):
