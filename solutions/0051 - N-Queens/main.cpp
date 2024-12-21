@@ -1,133 +1,88 @@
-#include <cstdlib>
-#include <iostream>
-#include <string>
 #include <vector>
-#include <algorithm>
+#include <string>
+#include <iostream>
 
-using std::cout, std::endl, std::abs;
+using std::cout, std::endl;
 
-
-class Board {
-public:
-	int size;
-	std::vector<int> squares; // 0 for empty, 1 for queen or attacked by queen
-	std::vector<std::pair<int, int>> queens;
-  Board(int size) {
-		this->size = size;
-		squares.resize(size*size);
-		std::fill(squares.begin(), squares.end(), 0);
+void print_board(std::vector<std::string> board) {
+	for (std::string row : board) {
+		cout << row << endl;
 	}
-	void set_queen(int x, int y) {
-		queens.push_back({x, y});
-		for (int i=0; i<size*size; i++) {
-			int board_x = i%size;
-			int board_y = i/size;
-			// cout << board_x << "," << board_y << endl;
-			// cout << (board_x - x) << " : " << (board_y -y) << endl;
-			if (abs(board_x - x) == abs(board_y - y)) { // diagonal
-				squares[i] = 1;
+	cout << endl;
+}
+
+bool is_valid(int x, int y, std::vector<std::string> &board, int n) {
+	// check column, only need to check "behind"
+	for (int i=y; i>=0; i--) {
+		if (board[i][x] == 'Q')
+			return false;
+	}
+
+	// TODO come back and clear these up, undefined behaviour
+	{
+		// check north-west diagonal
+		for (int i=y; i>=0; i--) {
+			if (x-(y-i) >= 0) {
+				if (board[i][x-(y-i)] == 'Q')
+				return false;
 			}
-			if (board_x == x)
-				squares[i] = 1; // horizontal
-			if (board_y == y)
-				squares[i] = 1; // vertical
+		}
+
+
+		// check north-east diagonal
+		for (int i=y; i>=0; i--) {
+			if (x+(y-i) < n) {
+				if (board[i][x+(y-i)] == 'Q')
+				return false;
+			}
 		}
 	}
+	return true;
+}
+
+std::vector<std::string> test_board = {
+	"Q.....",
+	"......",
+	"......",
+	"......"
 };
 
-// overloading printing of the Board class
-std::ostream& operator<<(std::ostream &out, Board const& data) {
-	for (int y=0; y<data.size; y++) {
-		for (int x=0; x<data.size ; x++) {
-			if (data.squares[data.size*y + x] == 1)
-				out << '#';
-			if (data.squares[data.size*y + x] == 0)
-				out << '.';
+
+std::vector<std::vector<std::string>> solved_boards;
+
+void solve_recurse(std::vector<std::string> board, int y, int n) { // don't want passing by reference as we use the copy to manipulate
+	for (int i=0; i<n; i++) {
+		if (is_valid(i, y, board, n)) {
+			board[y][i] = 'Q';
+			if (y==n-1) {
+				solved_boards.push_back(board);
+			} else {
+				solve_recurse(board, y+1, n);
+			}
+			board[y][i] = '.';
 		}
-		out << std::endl;
 	}
-	return out;
 }
 
-std::vector<std::string> queens_to_str(std::vector<std::pair<int, int>> queens, int n) {
-	std::vector<int> queenboard(n*n, 0);
-	for (std::pair<int, int> q : queens) {
-		queenboard[q.second*n + q.first] = 1;
-	}
-	std::vector<std::string> output;
-	for (int y=0; y<n; y++) {
-		std::string line;
-		for (int x=0; x<n ; x++) {
-			if (queenboard[n*y + x] == 1)
-				line.append("Q");
-			if (queenboard[n*y + x] == 0)
-				line.append(".");
-		}
-		output.push_back(line);
-	}
-	return output;
-}
-
-std::vector<std::vector<std::string>> found; // no hashing function for pairs
-
-void print_queens(std::vector<std::pair<int, int>> queens, int n) {
-	std::vector<int> queenboard(n*n, 0);
-	for (std::pair<int, int> q : queens) {
-		queenboard[q.second*n + q.first] = 1;
-	}
-	for (int y=0; y<n; y++) {
-		for (int x=0; x<n ; x++) {
-			if (queenboard[n*y + x] == 1)
-				std::cout << '#';
-			if (queenboard[n*y + x] == 0)
-				std::cout << '.';
-		}
-		std::cout << std::endl;
-	}
-	std::cout << std::endl;
-}
-
-void solve(Board board, int n, int y) {
-	cout << y << endl;
-	// cout << board << endl;
-	if (board.queens.size() == n) {
-		for (std::vector<std::string> s : found) {
-			if (s == queens_to_str(board.queens, n)) 
-				return;
-		}
-		print_queens(board.queens, n);
-		found.push_back(queens_to_str(board.queens, n));
-	}
-	if (y+1>n)
-		return;
-	for (int x=0; x<n; x++) {
-		if (board.squares[n*y + x] == 0) {
-			Board newboard = board;
-			newboard.set_queen(x, y);
-			solve(newboard, n, y+1);
-		}
-	}
-  return;
+std::vector<std::vector<std::string>> solve(int n) {
+	std::vector<std::string> initial_board(n);
+	std::fill(initial_board.begin(), initial_board.end(), std::string(n, '.'));
+	solve_recurse(initial_board, 0, n);
+	return solved_boards;
 }
 
 int main() {
-	int size = 4;
-	Board board(size);
-	solve(board, size, 0);
-	cout << found.size() << endl;
-	// for (std::vector<std::string> b : found) {
-	// 	for (std::string s : b) {
-	// 		cout << s << endl;
-	// 	}
-	// 	cout << endl;
-	// }
+	cout << solve(10).size() << endl;
+	for (std::vector<std::string> board : solved_boards) {
+		print_board(board);
+	}
 	return 0;
 }
 
 /**
-	 Initial solution.
-	 Quite rough, certainly more for loops iterating through data structures than necessary.
-	 Better solution is probably to just work on a vector with no classes, too much fiddling
-	 around with data structures outside the realm of the problem.
-	 I'll come back to this.
+	 Much better overall solution.
+	 Main improvements are removing looking and only checking
+	 backwards, as well as a lot less faffing around with data
+	 structure formatting.
+	 Could use a bit of cleaning up, but otherwise good.
  **/
