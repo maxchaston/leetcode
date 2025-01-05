@@ -17,10 +17,7 @@ int lengthOfLongestSubstring(string s) {
 	int left = 0;
 	for (int right=0; right<s.length(); right++) {
 
-		if (map.count(s[right]) != 0) { // new value is already in the map
-			for (;left<=map[s[right]];left++) { // catch left side of window up to duplicate
-				map.erase(s[left]);
-			}
+		if (map.count(s[right]) != 0 || map[s[right]] < left) { // new value is already in the map
 			map[s[right]] = right;
 		}
 
@@ -40,6 +37,9 @@ int main() {
 /**
 	 Second solution.
 	 Sliding window approach.
-	 Still didn't place very well on the leetode histogram.
-	 I assume this time it's because of the map.count() function being poorly optimised.
+	 Placed much better this time.
+	 The count function was constant on average, so that wasn't the problem.
+	 Improvement found by removing the loop removing each element when catching the left side of window up.
+	 Replaced with an extra check for if the duplicate value is behind the left side of the window, we can ignore these.
+	 Much more efficient than manually removing each element.
  **/
