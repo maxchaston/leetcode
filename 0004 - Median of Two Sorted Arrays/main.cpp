@@ -12,6 +12,13 @@ Given two sorted arrays nums1 and nums2 of size m and n respectively, return the
 The overall run time complexity should be O(log (m+n)).
 **/
 
+/**
+	 This one was quite tricky, my intuition was not to do this at all.
+	 The merge list method was obvious but did not meet the time requirements.
+	 This binary search method was not immediately obvious, had to look the logic up online.
+	 The finagling of oob indexes was a little troublesome to think about in relation to the wider method.
+ **/
+
 
 double findMedianSortedArrays(vector<int> nums1, vector<int> nums2) {
 	if (nums1.size() < nums2.size()) // ensure nums1 is the larger array
