@@ -4,29 +4,24 @@
 using namespace std;
 
 /**
-         Initial solution, iterates through all one by one.
-         Pretty slow, just a general solution.
-         Better way would be to iterate one at a time through all, because you
- have the change to exit sooner.
+	 Better solution.
  **/
 
 string longestCommonPrefix(vector<string> &strs) {
-  string outstr = strs[0];
-  for (int i = 1; i < strs.size(); i++) {
-    cout << strs[i] << endl;
-    cout << outstr << endl;
-    string tmp = "";
-    for (int j = 0; j < strs[i].length(); j++) {
-      if (outstr[j] != strs[i][j]) {
-        cout << "ding" << endl;
-        if (j == 0)
-          return "";
-        outstr = outstr.substr(0, j);
-        goto end;
+  string outstr = "";
+  int minlen = strs[0].length();
+  for (string s : strs) {
+    if (s.length() < minlen)
+      minlen = s.length();
+  }
+  for (int j = 0; j < minlen; j++) {
+    char c = strs[0][j];
+    for (int i = 0; i < strs.size(); i++) {
+      if (c != strs[i][j]) {
+				return outstr;
       }
     }
-    outstr = strs[i];
-  end:
+    outstr.append(1, c);
   }
   return outstr;
 }
