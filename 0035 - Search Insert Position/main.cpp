@@ -3,9 +3,8 @@
 using namespace std;
 
 /**
-         Functional binary search solution.
-         A little convoluted though, need to make a cleaner solution for 1
- element.
+	 Better binary search solution.
+	 Slight more clean, better exit condition.
  **/
 
 void print_vec(vector<int> x, int l, int r) {
@@ -19,31 +18,13 @@ int searchInsert(vector<int> &nums, int target) {
   int l = 0;
   int r = nums.size() - 1;
   while (1) {
-  start:
-    print_vec(nums, l, r);
     int midpoint = (r + l) / 2;
     int val = nums[midpoint];
     if (val == target)
       return midpoint;
-    if (r == l) {
-      cout << "a" << endl;
-      cout << "val:" << val << endl;
-      cout << "target:" << target << endl;
-      cout << "r:" << r << endl;
-      return r + (val < target ? 1 : 0);
-    }
-    if (r == l + 1) {
-      cout << "b" << endl;
-      cout << "val:" << val << endl;
-      cout << "target:" << target << endl;
-      cout << "r:" << r << endl;
-      cout << "l:" << l << endl;
-      if (nums[r] > target) {
-        r--;
-      } else {
-        l++;
-      }
-      goto start;
+    if (r <= l) {
+			val = nums[l];
+      return l + (val < target ? 1 : 0);
     }
     if (val < target) {
       l = midpoint + 1;
@@ -54,7 +35,7 @@ int searchInsert(vector<int> &nums, int target) {
 }
 
 int main() {
-  vector<int> x = {1, 3};
-  cout << searchInsert(x, 0) << endl;
+  vector<int> x = {3,5 ,7, 9, 10};
+  cout << searchInsert(x, 8) << endl;
   return 0;
 }
